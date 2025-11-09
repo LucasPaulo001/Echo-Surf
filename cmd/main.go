@@ -4,29 +4,44 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/LucasPaulo001/Echo-Surf/internal/browser"
+	"github.com/LucasPaulo001/Echo-Surf/internal/media"
 	"github.com/fatih/color"
 )
 
 
 func main() {
+	// Cores
+	title := color.New(color.FgCyan, color.Bold).SprintFunc()
+	info := color.New(color.FgGreen).SprintFunc()
+	section := color.New(color.FgYellow, color.Bold).SprintFunc()
+	error := color.New(color.FgRed, color.Bold).SprintFunc()
+
 	url := flag.String("url", "", "URL da página a ser acessada (https://example.com).")
 	headers := flag.Bool("headers", false, "Exibir headers HTTP")
 	linksOnly := flag.Bool("links", false, "Mostrar apenas links da página")
 	imagesOnly := flag.Bool("images", false, "Mostrar apenas as imagens")
+	downloadYt := flag.String("download", "", "URL do vídeo para download")
+	help := flag.Bool("help", false, "Exibir ajuda do CLI")
 
 	flag.Parse()
+
+	if *help {
+		fmt.Println(section("\n--- Ajunda ---"))
+		fmt.Print("[--url <url> --links]: Lista os links de uma página web\n")
+		fmt.Print("[--url <url>]: Lista os dados da página web\n")
+		fmt.Print("[--url <url> --images]: Lista as imagens de uma página web\n")
+		fmt.Print("[--url <url> --download (mp3 ou mp4)]: Faz download de mídia\n")
+
+		return
+	}
 
 	if *url == "" {
 		fmt.Println("Uso: echosurf --url https://example.com [--save] [--headers]")
 		return
 	}
-
-	// Cores
-	title := color.New(color.FgCyan, color.Bold).SprintFunc()
-	info := color.New(color.FgGreen).SprintFunc()
-	section := color.New(color.FgYellow, color.Bold).SprintFunc()
 
 	// Retorno de busca
 	fmt.Print("\n" + title("Echo Surf v0.1 - Navegador de Linha de Comando\n\n"))
@@ -68,6 +83,17 @@ func main() {
 			fmt.Println("-", image)
 		}
 
+		return
+	}
+
+	if *downloadYt != "" {
+		err := media.DownloadMedia(*url, *downloadYt)
+		if err != nil {
+			fmt.Print(error("Erro ao baixar mídia: ", err))
+			os.Exit(1)
+		}
+
+		fmt.Println("Download concluído com sucesso.")
 		return
 	}
 }
