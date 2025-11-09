@@ -12,14 +12,14 @@ type Page struct {
 	StatusCode	int
 	Body		[]byte
 	Title 		string
-	LinkCount 	int
-	ImagesCount int
+	Links 		[]string
+	Images      []string
 	Headers 	http.Header
 }
 
 func LoadPage(url string) (*Page, error) {
 	client := &http.Client{
-		Timeout: 15 * time.Second,
+		Timeout: 30 * time.Second,
 	}
 
 	resp, err := client.Get(url)
@@ -43,8 +43,8 @@ func LoadPage(url string) (*Page, error) {
 		StatusCode:  resp.StatusCode,
 		Body: 		 body,	
 		Title: 		 title,	
-		LinkCount:   links,
-		ImagesCount: imgs,
+		Links:   	 links,
+		Images:      imgs,
 		Headers:     resp.Header,
 	}
 

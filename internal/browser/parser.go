@@ -2,20 +2,48 @@ package browser
 
 import (
 	"io"
-
-	"github.com/PuerkitoBio/goquery"
+	"strings"
+	"golang.org/x/net/html"
 )
 
-func Extract(r io.Reader) (string, int, int) {
-	doc, err := goquery.NewDocumentFromReader(r)
+func Extract(r io.Reader) (string, []string, []string) {
+	doc, err := html.Parse(r)
 
 	if err != nil {
-		return "", 0, 0
+		return "", nil, nil
 	}
 
-	title := doc.Find("title").First().Text()
-	links := doc.Find("a").Length()
-	imgs := doc.Find("img").Length()
+	var title string
+	var links []string
+	var images  []string
 
-	return title, links, imgs
+	var crawl func(*html.Node)
+	crawl = func(n *html.Node) {
+		if n.Type == html.ElementNode {
+			switch n.Data {
+			case "title":
+				if n.FirstChild != nil {
+					title = strings.TrimSpace(n.FirstChild.Data)
+				}
+			case "a":
+				for _, attr := range n.Attr {
+					if attr.Key == "href" && attr.Val != "" {
+						links = append(links, attr.Val)
+					}
+				}
+			case "img":
+				for _, attr := range n.Attr {
+					if attr.Key == "src" && attr.Val != "" {
+						images = append(images, attr.Val)
+					}
+				}
+			}
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			crawl(c)
+		}
+	}
+
+	crawl(doc)
+	return title, links, images
 }
