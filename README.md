@@ -10,6 +10,7 @@
 O **Echo Surf** é um navegador de linha de comando escrito em **Go** que permite:
 
 - Acessar e analisar páginas web
+- Testar endpoints (GET, POST, PUT, PATCH, DELETE)
 - Visualizar **título**, **links**, **imagens** e **headers**
 - Fazer **downloads de vídeos e áudios** (via `yt-dlp`)
 - Funcionar como uma ferramenta de estudo e inspeção da web
@@ -49,3 +50,16 @@ O **Echo Surf** é um navegador de linha de comando escrito em **Go** que permit
 3. Download de vídeos e áudios (yt-dlp integrado)
 ```bash
    go run ./cmd/main.go --url https://exemple.com --download mp4 / mp3
+```
+
+## Testando APIs com o Echo Surf
+
+1. Exemplo de teste
+```bash
+   go run ./cmd/main.go --url-test <link> --method <Passa o método após a flag> --body '{json}' --headers-test <headers após a flag> --json 
+```
+> --url-test => endpoint para ser testado
+> --method => (GET, POST, PUT, PATCH, DELETE) *caso omitido será GET*
+> --body => '{"email": "email@gmai.com", "password": "password123"}' *<= exemplo de body*
+> --headers-test => "Content-Type:application/json"
+> > se caso o header precisar de token "Content-Type:application/json;Authorization: Bearer <token>"

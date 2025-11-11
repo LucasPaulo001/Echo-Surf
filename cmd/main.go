@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/LucasPaulo001/Echo-Surf/internal/api"
 	"github.com/LucasPaulo001/Echo-Surf/internal/browser"
 	"github.com/LucasPaulo001/Echo-Surf/internal/media"
 	"github.com/fatih/color"
@@ -19,12 +20,21 @@ func main() {
 	section := color.New(color.FgYellow, color.Bold).SprintFunc()
 	error := color.New(color.FgRed, color.Bold).SprintFunc()
 
+	// Flags para uso
 	url := flag.String("url", "", "URL da página a ser acessada (https://example.com).")
 	headers := flag.Bool("headers", false, "Exibir headers HTTP")
 	linksOnly := flag.Bool("links", false, "Mostrar apenas links da página")
 	imagesOnly := flag.Bool("images", false, "Mostrar apenas as imagens")
 	downloadYt := flag.String("download", "", "URL do vídeo para download")
 	help := flag.Bool("help", false, "Exibir ajuda do CLI")
+
+	// Flags de teste (APIs)
+	urlAPI := flag.String("url-test", "", "URL da API para testes")
+	method := flag.String("method", "GET", "Método HTTP (GET, POST, PUT, PATCH, DELETE)")
+	body := flag.String("body", "", "Corpo da requisição em JSON")
+	headersAPI := flag.String("headers-test", "", "headers da requisição")
+	jsonFormat := flag.Bool("json", false, "Exibir resposta formatada em json")
+
 
 	flag.Parse()
 
@@ -38,6 +48,20 @@ func main() {
 		return
 	}
 
+	// Testar APIs
+	if *method != ""{
+		fmt.Println("Modo: Teste de API")
+
+		err := api.TestAPI(*urlAPI, *method, *body, *headersAPI, *jsonFormat)
+
+		if err != nil {
+			log.Fatal("Erro ao testar API:", err)
+		}
+
+		return
+	}
+
+	// Dados de uma página web
 	if *url == "" {
 		fmt.Println("Uso: echosurf --url https://example.com [--save] [--headers]")
 		return
